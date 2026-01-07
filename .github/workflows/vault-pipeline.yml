@@ -1,0 +1,43 @@
+name: Vault JIT Secret Injection Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  run-app:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Vault CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget gpg
+          wget -O- https://apt.releases.hashicorp.com/gpg | \
+            gpg --dearmor | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg > /dev/null
+          echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] \
+            https://apt.releases.hashicorp.com $(lsb_release -cs) main" | \
+            sudo tee /etc/apt/sources.list.d/hashicorp.list
+          sudo apt-get update
+          sudo apt-get install -y vault
+
+      - name: Set Vault environment variables
+        run: |
+          echo "VAULT_ADDR=${{ secrets.VAULT_ADDR }}" >> $GITHUB_ENV
+          echo "VAULT_TOKEN=${{ secrets.VAULT_TOKEN }}" >> $GITHUB_ENV
+
+      - name: Fetch secret from Vault
+        run: |
+          export DB_PASSWORD=$(vault kv get -field=DB_PASSWORD secret/demo)
+          echo "DB_PASSWORD=$DB_PASSWORD" >> $GITHUB_ENV
+
+      - name: Install Python
+        run: sudo apt-get install -y python3
+
+      - name: Run application with injected secret
+        run: |
+          python3 app.py
