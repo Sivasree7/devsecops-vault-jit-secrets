@@ -22,7 +22,7 @@ jobs:
       - name: Set Vault environment variables
         run: |
           export VAULT_ADDR=https://easiest-ginny-unrazed.ngrok-free.dev
-          export VAULT_TOKEN="root"
+          export VAULT_TOKEN=${{ secrets.VAULT_TOKEN }}
 
       - name: Fetch secret from Vault
         run: |
