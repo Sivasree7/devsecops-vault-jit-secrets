@@ -21,12 +21,12 @@ jobs:
 
       - name: Set Vault environment variables
         run: |
-          export VAULT_ADDR="http://127.0.0.1:8200"
+          export VAULT_ADDR=https://easiest-ginny-unrazed.ngrok-free.dev
           export VAULT_TOKEN="root"
 
       - name: Fetch secret from Vault
         run: |
-          DB_PASSWORD=$(vault kv get -field=password secret/db)
+          DB_PASSWORD=$(vault kv get -field=password secret/db)  
           echo "DB_PASSWORD=$DB_PASSWORD" >> $GITHUB_ENV
 
       - name: Install Python
