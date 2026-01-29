@@ -1,4 +1,4 @@
-name: Vault JIT Secret Injection Pipeline
+name: Vault JIT Secret Injection Pipeline 
 
 on:
   push:
